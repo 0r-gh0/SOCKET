@@ -5,7 +5,7 @@
 #include <arpa/inet.h>
 #include <pthread.h>
 
-#define PORT 9999
+#define PORT 6969
 #define BUFFER_SIZE 1024
 
 // Function to handle each client connection
@@ -22,16 +22,25 @@ void *handle_client(void *arg) {
             pthread_exit(NULL);
         }
         
-        // printf("Received from client %d: %s\n", client_fd, buffer);
         // Convert received message to integer
         int num = atoi(buffer);
         printf("Received from client %d: %d\n", client_fd, num);
         
-        // If client sends 0, stop working and remove the user
-        if (num == 0) {
+        // If client sends -1, stop working and remove the user
+        if (num == -1) {
             printf("Client %d sent 0, closing connection.\n", client_fd);
             close(client_fd);
             pthread_exit(NULL);
+        }
+        
+        // If client sends 0, return back the same buffer received
+        if (num == 0) {
+            if (send(client_fd, buffer, strlen(buffer), 0) == -1) {
+                perror("Sending data failed");
+                close(client_fd);
+                pthread_exit(NULL);
+            }
+            continue;
         }
         
         // Add 5 to the received number
