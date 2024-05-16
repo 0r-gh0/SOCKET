@@ -5,7 +5,7 @@
 #include <arpa/inet.h>
 
 #define SERVER_IP "127.0.0.1"
-#define PORT 9999
+#define PORT 6969
 #define BUFFER_SIZE 1024
 
 int main() {
@@ -38,6 +38,13 @@ int main() {
         // Sending to server
         printf("Enter message to send: ");
         fgets(buffer, BUFFER_SIZE, stdin);
+        
+        // Check if the input is -1 to break the loop and disconnect
+        if (strcmp(buffer, "-1") == 0) {
+            printf("Disconnecting from the server...\n");
+            break;
+        }
+        
         if (send(client_fd, buffer, strlen(buffer), 0) == -1) {
             perror("Sending data failed");
             exit(EXIT_FAILURE);
@@ -53,5 +60,6 @@ int main() {
     }
 
     close(client_fd);
+    printf("Disconnected from server\n");
     return 0;
 }
